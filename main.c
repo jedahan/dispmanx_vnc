@@ -374,7 +374,7 @@ static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 
 	printf("mouse: 0x%x at %d,%d", buttonMask, x,y);
 
-	memset(&event, 0, sizeof(mEvent));
+	memset(&mEvent, 0, sizeof(mEvent));
 	if (relative_mode) {
 		mEvent[0].type = EV_REL;
 		mEvent[0].code = REL_X;
@@ -391,8 +391,8 @@ static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 		mEvent[1].code = ABS_Y;
 		mEvent[1].value = y;
 	}
-	write(ufile, &event, sizeof(event));
-	printf(" => %d,%d\n", event[0].value, event[1].value);
+	write(ufile, &mEvent, sizeof(mEvent));
+	printf(" => %d,%d\n", mEvent[0].value, mEvent[1].value);
 
 	last_x = x;
 	last_y = y;
