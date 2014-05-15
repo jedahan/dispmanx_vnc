@@ -369,32 +369,30 @@ static int keysym2scancode(rfbKeySym key)
 static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 {
 	// send x & y together
-	struct input_event event[2];
+	struct input_event mEvent[2];
+	struct input_event event;
 
 	printf("mouse: 0x%x at %d,%d", buttonMask, x,y);
 
-	memset(&event, 0, sizeof(event));
-	gettimeofday(&event.time, NULL);
+	memset(&event, 0, sizeof(mEvent));
 	if (relative_mode) {
-		event[0].type = EV_REL;
-		event[0].code = REL_X;
-		event[0].value = x - last_x;
-		event[1].type = EV_REL;
-		event[1].code = REL_Y;
-		event[1].value = y - last_y;
+		mEvent[0].type = EV_REL;
+		mEvent[0].code = REL_X;
+		mEvent[0].value = x - last_x;
+		mEvent[1].type = EV_REL;
+		mEvent[1].code = REL_Y;
+		mEvent[1].value = y - last_y;
 	}
 	else {
-		event[0].type = EV_ABS;
-		event[0].code = ABS_X;
-		event[0].value = x;
-		event[1].type = EV_ABS;
-		event[1].code = ABS_Y;
-		event[1].value = y;
+		mEvent[0].type = EV_ABS;
+		mEvent[0].code = ABS_X;
+		mEvent[0].value = x;
+		mEvent[1].type = EV_ABS;
+		mEvent[1].code = ABS_Y;
+		mEvent[1].value = y;
 	}
 	write(ufile, &event, sizeof(event));
 	printf(" => %d,%d\n", event[0].value, event[1].value);
-
-	gettimeofday(&event.time, NULL);
 
 	last_x = x;
 	last_y = y;
