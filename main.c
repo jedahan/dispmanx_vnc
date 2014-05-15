@@ -93,7 +93,7 @@ int TakePicture(unsigned char *buffer)
 	vc_dispmanx_snapshot(display, resource, transform);
 
 	vc_dispmanx_rect_set(&rect, 0, 0, info.width, info.height);
-	vc_dispmanx_resource_read_data(resource, &rect, image, pitch); 
+	vc_dispmanx_resource_read_data(resource, &rect, image, pitch);
 
 	unsigned short *image_p = (unsigned short *)image;
 	unsigned short *buffer_p = (unsigned short *)buffer;
@@ -108,7 +108,7 @@ int TakePicture(unsigned char *buffer)
 			if (back_image_p[i*padded_width + j] != image_p[i*padded_width + j])
 			{
 				r_y0 = i;
-				found  = 1;		
+				found  = 1;
 				break;
 			}
 		}
@@ -121,7 +121,7 @@ int TakePicture(unsigned char *buffer)
 			if (back_image_p[i*padded_width + j] != image_p[i*padded_width + j])
 			{
 				r_y1 = i+1;
-				found  = 1;		
+				found  = 1;
 				break;
 			}
 		}
@@ -134,7 +134,7 @@ int TakePicture(unsigned char *buffer)
 			if (back_image_p[j*padded_width + i] != image_p[j*padded_width + i])
 			{
 				r_x0 = i;
-				found  = 1;		
+				found  = 1;
 				break;
 			}
 		}
@@ -147,7 +147,7 @@ int TakePicture(unsigned char *buffer)
 			if (back_image_p[j*padded_width + i] != image_p[j*padded_width + i])
 			{
 				r_x1 = i+1;
-				found  = 1;		
+				found  = 1;
 				break;
 			}
 		}
@@ -155,9 +155,9 @@ int TakePicture(unsigned char *buffer)
 
 	for(j=r_y0;j<r_y1;++j) {
 		for(i=r_x0;i<r_x1;++i) {
-			unsigned short	tbi = image_p[j*padded_width + i]; 
+			unsigned short	tbi = image_p[j*padded_width + i];
 
-			unsigned short        R5 = (tbi >> 11); 
+			unsigned short        R5 = (tbi >> 11);
 			unsigned short       G5 = ((tbi >> 6) & 0x1f);
 			unsigned short         B5 = tbi & 0x1f;
 
@@ -191,7 +191,7 @@ int TakePicture(unsigned char *buffer)
 	last_line = line;
 	fprintf(stderr,"%03d/%03d Picture (%03d fps) ", line, info.height, fps);
 
-	fprintf(stderr, "x0=%d, y0=%d, x1=%d, y1=%d              \r", r_x0, r_y0, r_x1, r_y1); 
+	fprintf(stderr, "x0=%d, y0=%d, x1=%d, y1=%d              \r", r_x0, r_y0, r_x1, r_y1);
 	/* success!   We have a new picture! */
 	return (1==1);
 }
@@ -227,6 +227,7 @@ void initUinput()
 	}
 
 	ioctl(ufile, UI_SET_EVBIT, EV_KEY);
+	ioctl(ufile, UI_SET_EVBIT, EV_SYN);
 
 	for (i=0; i<KEY_MAX; i++) { //I believe this is to tell UINPUT what keys we can make?
 		ioctl(ufile, UI_SET_KEYBIT, i);
@@ -322,7 +323,7 @@ static int keysym2scancode(rfbKeySym key)
 		case XK_colon:    scancode    = KEY_SEMICOLON;     break;
 		case XK_apostrophe:    scancode       = KEY_APOSTROPHE;     break;
 		case XK_quotedbl:    scancode         = KEY_APOSTROPHE;     break;
-		case XK_grave:    scancode    = KEY_GRAVE;     break;    
+		case XK_grave:    scancode    = KEY_GRAVE;     break;
 		case XK_asciitilde:    scancode       = KEY_GRAVE;     break;
 		case XK_backslash:    scancode        = KEY_BACKSLASH;     break;
 		case XK_bar:    scancode              = KEY_BACKSLASH;     break;
@@ -403,7 +404,7 @@ static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 	memset(&event, 0, sizeof(event));
 	gettimeofday(&event.time, NULL);
 	event.type = EV_SYN;
-	event.code = SYN_REPORT; 
+	event.code = SYN_REPORT;
 	event.value = 0;
 	write(ufile, &event, sizeof(event));
 	if (mouse_last != buttonMask) {
@@ -421,7 +422,7 @@ static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 			memset(&event, 0, sizeof(event));
 			gettimeofday(&event.time, NULL);
 			event.type = EV_SYN;
-			event.code = SYN_REPORT; 
+			event.code = SYN_REPORT;
 			event.value = 0;
 			write(ufile, &event, sizeof(event));
 		}
@@ -440,7 +441,7 @@ static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 			memset(&event, 0, sizeof(event));
 			gettimeofday(&event.time, NULL);
 			event.type = EV_SYN;
-			event.code = SYN_REPORT; 
+			event.code = SYN_REPORT;
 			event.value = 0;
 			write(ufile, &event, sizeof(event));
 		}
@@ -458,13 +459,13 @@ static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 			memset(&event, 0, sizeof(event));
 			gettimeofday(&event.time, NULL);
 			event.type = EV_SYN;
-			event.code = SYN_REPORT; 
+			event.code = SYN_REPORT;
 			event.value = 0;
 			write(ufile, &event, sizeof(event));
 		}
 
 		mouse_last = buttonMask;
-	}	
+	}
 }
 
 static void dokey(rfbBool down,rfbKeySym key,rfbClientPtr cl)
@@ -583,7 +584,7 @@ int main(int argc, char *argv[])
 	rfbInitServer(server);
 
 	end = setjmp(env);
-	if (end != 0) goto end;  
+	if (end != 0) goto end;
 
 
 	initUinput();
@@ -613,4 +614,3 @@ end:
 	return 0;
 
 }
-
