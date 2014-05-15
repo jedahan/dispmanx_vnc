@@ -371,6 +371,7 @@ static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 	// send x & y together
 	struct input_event mEvent[2];
 	struct input_event event;
+	int ret = 0;
 
 	printf("mouse: 0x%x at %d,%d", buttonMask, x,y);
 
@@ -391,8 +392,10 @@ static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 		mEvent[1].code = ABS_Y;
 		mEvent[1].value = y;
 	}
-	write(ufile, &mEvent, sizeof(mEvent));
-	printf(" => %d,%d\n", mEvent[0].value, mEvent[1].value);
+	ret = write(ufile, &mEvent, sizeof(mEvent));
+
+	printf(" => %d,%d", mEvent[0].value, mEvent[1].value);
+	printf(" returned %d\n", ret);
 
 	last_x = x;
 	last_y = y;
