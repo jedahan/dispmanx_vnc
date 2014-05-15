@@ -207,7 +207,7 @@ void initUinput()
 	int retcode, i;
 
 
-	ufile = open("/dev/uinput", O_WRONLY | O_NDELAY );
+	ufile = open("/dev/uinput", O_WRONLY | O_NONBLOCK );
 	printf("open /dev/uinput returned %d.\n", ufile);
 	if (ufile == 0) {
 		printf("Could not open uinput.\n");
@@ -215,9 +215,12 @@ void initUinput()
 	}
 
 	memset(&uinp, 0, sizeof(uinp));
-	strncpy(uinp.name, "VNCServer SimKey", 20);
-	uinp.id.version = 4;
+	//strncpy(uinp.name, "VNCServer SimKey", 20);
+	snprintf(uinp.name, UINPUT_MAX_NAME_SIZE, "VNCServer SimKey");
 	uinp.id.bustype = BUS_USB;
+	uinp.id.vendor = 0x1;
+	uinp.id.product = 0x1;
+	uinp.id.version = 1;
 
 	if (!relative_mode) {
 		uinp.absmin[ABS_X] = 0;
@@ -251,7 +254,7 @@ void initUinput()
 	retcode = write(ufile, &uinp, sizeof(uinp));
 	printf("First write returned %d.\n", retcode);
 
-	retcode = (ioctl(ufile, UI_DEV_CREATE));
+	retcode = ioctl(ufile, UI_DEV_CREATE);
 	printf("ioctl UI_DEV_CREATE returned %d.\n", retcode);
 	if (retcode) {
 		printf("Error create uinput device %d.\n", retcode);
@@ -365,38 +368,33 @@ static int keysym2scancode(rfbKeySym key)
 
 static void doptr(int buttonMask, int x, int y, rfbClientPtr cl)
 {
-	struct input_event       event;
+	// send x & y together
+	struct input_event event[2];
 
-	//printf("mouse: 0x%x at %d,%d\n", buttonMask, x,y);
-
-
-	memset(&event, 0, sizeof(event));
-	gettimeofday(&event.time, NULL);
-	if (relative_mode) {
-		event.type = EV_REL;
-		event.code = REL_X;
-		event.value = x - last_x;
-	}
-	else {
-		event.type = EV_ABS;
-		event.code = ABS_X;
-		event.value = x;
-	}
-	write(ufile, &event, sizeof(event));
+	printf("mouse: 0x%x at %d,%d", buttonMask, x,y);
 
 	memset(&event, 0, sizeof(event));
 	gettimeofday(&event.time, NULL);
 	if (relative_mode) {
-		event.type = EV_REL;
-		event.code = REL_Y;
-		event.value = y - last_y;
+		event[0].type = EV_REL;
+		event[0].code = REL_X;
+		event[0].value = x - last_x;
+		event[1].type = EV_REL;
+		event[1].code = REL_Y;
+		event[1].value = y - last_y;
 	}
 	else {
-		event.type = EV_ABS;
-		event.code = ABS_Y;
-		event.value = y;
+		event[0].type = EV_ABS;
+		event[0].code = ABS_X;
+		event[0].value = x;
+		event[1].type = EV_ABS;
+		event[1].code = ABS_Y;
+		event[1].value = y;
 	}
 	write(ufile, &event, sizeof(event));
+	printf(" => %d,%d\n", event[0].value, event[1].value);
+
+	gettimeofday(&event.time, NULL);
 
 	last_x = x;
 	last_y = y;
